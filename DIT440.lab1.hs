@@ -54,7 +54,53 @@ test = and [testComparePower1, testComparePower2]
 
 -- Assignment 5
 
+-- Calculate length of string
+getStringLength :: Integer -> Integer
+getStringLength x = max 6 $ toInteger $ length $ show $ x
 
+-- Calculate how many spaces to pad a string with to achieve length l
+getPadLength :: String -> Integer -> Integer
+getPadLength str l = (l - k) 
+	where k = toInteger $ length $ str
+
+-- Pad a string to length l from the right. Like: "text    "
+padRight :: String -> Integer -> String
+padRight str l = concat $ [str] ++ pad
+	where 
+		pad = take num $ repeat " "
+		num = fromInteger $ getPadLength str l
+
+-- Format a row of strings into with padding of each segment to maxLength
+formatRow :: [String] -> Integer -> String
+formatRow row maxLength = unwords [padRight i maxLength | i <- row]
+
+buildNumberList :: Integer -> Integer -> [String]
+buildNumberList x k = [
+		show k,
+		show $ power  x k,
+		show $ power1 x k, 
+		show $ power2 x k
+	]
+
+-- Builds the table, returns a list with each row as Strings
+buildTable :: Integer -> Integer -> [[String]]
+buildTable x n = 
+	   [["n","power","power1","power2"]] ++ [buildNumberList x k | k <- [0..n]]
+		
+-- Format all the rows in a table
+formatTable :: [[String]] -> Integer ->  [String]
+formatTable list l = [formatRow r l | r <- list]
+
+-- Outputs a table 
+printTable :: Integer -> Integer -> IO()
+printTable x n = putStr $ unlines $ formatTable (buildTable x n) $ getStringLength $ power x n
+
+--main = printTable 2 15
+tab :: Html
+tab = simpleTable [] []
+    [ [toHtml e | e <- r] | r <- (buildTable 3 5) ]
+
+main = writeFile "table.html" (renderHtml tab)
 
 
 
